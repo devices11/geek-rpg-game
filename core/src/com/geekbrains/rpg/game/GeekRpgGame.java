@@ -15,6 +15,9 @@ public class GeekRpgGame extends ApplicationAdapter {
     private float rt;
     private Hero hero;
 
+    private float newX = 100.0f;
+    private float newY = 100.0f;
+
     // Домашнее задание:
     // - Разобраться с кодом
     // - Персонаж должен двигаться к указателю
@@ -25,7 +28,7 @@ public class GeekRpgGame extends ApplicationAdapter {
         hero = new Hero();
         textureGrass = new Texture("grass.png");
         texturePointer = new Texture("pointer.png");
-        pointerPosition = new Vector2(0, 0);
+        pointerPosition = new Vector2(100, 100);
     }
 
     @Override
@@ -40,17 +43,21 @@ public class GeekRpgGame extends ApplicationAdapter {
                 batch.draw(textureGrass, i * 80, j * 80);
             }
         }
-        batch.draw(texturePointer, pointerPosition.x - 32, pointerPosition.y - 32, 32, 32, 64, 64, 1, 1, rt, 0, 0, 64, 64, false, false);
-        hero.render(batch);
+        batch.draw(texturePointer, pointerPosition.x - 32, pointerPosition.y - 32, 32, 32, 64, 64, 0.5f, 0.5f, rt, 0, 0, 64, 64, false, false);
+        hero.render(batch, newX);
         batch.end();
     }
 
     public void update(float dt) {
         rt -= dt * 90.0f;
-        hero.update(dt);
-        if (Gdx.input.justTouched()) {
+
+        if (Gdx.input.isTouched()) {
+            newX = Gdx.input.getX();
+            newY = 720 - Gdx.input.getY();
             pointerPosition.set(Gdx.input.getX(), 720.0f - Gdx.input.getY());
         }
+
+        hero.update(dt, newX, newY);
     }
 
     @Override

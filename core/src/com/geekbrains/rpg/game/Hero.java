@@ -1,7 +1,5 @@
 package com.geekbrains.rpg.game;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -17,22 +15,25 @@ public class Hero {
         this.speed = 100.0f;
     }
 
-    public void render(SpriteBatch batch) {
-        batch.draw(texture, position.x - 32, position.y - 32,32,32,64,64,1,1,0,0,0,64,64,false,false);
+    public void render(SpriteBatch batch, float newX) {
+        if (newX > position.x)
+        batch.draw(texture, position.x - 32, position.y - 32,32,32,64,64,1,1,0,0,0,126,145,true,false);
+        if (newX <= position.x)
+        batch.draw(texture, position.x - 32, position.y - 32,32,32,64,64,1,1,0,0,0,126,145,false,false);
     }
 
-    public void update(float dt) {
-        if(Gdx.input.isKeyPressed(Input.Keys.A)) {
-            position.x -= speed * dt;
-        }
-        if(Gdx.input.isKeyPressed(Input.Keys.D)) {
+    public void update(float dt, float newX, float newY) {
+        if (position.x < newX){
             position.x += speed * dt;
         }
-        if(Gdx.input.isKeyPressed(Input.Keys.S)) {
-            position.y -= speed * dt;
+        if (position.x > newX){
+            position.x -= speed * dt;
         }
-        if(Gdx.input.isKeyPressed(Input.Keys.W)) {
+        if (position.y < newY){
             position.y += speed * dt;
+        }
+        if (position.y > newY){
+            position.y -= speed * dt;
         }
     }
 }
