@@ -17,14 +17,22 @@ public class Hero extends GameCharacter {
     }
 
     public Hero(GameController gc) {
-        super(gc, 10, 300.0f);
+        super(gc, 30, 300.0f);
         this.texture = Assets.getInstance().getAtlas().findRegion("knight");
         this.texturePointer = Assets.getInstance().getAtlas().findRegion("pointer");
         this.changePosition(100.0f, 100.0f);
         this.dst.set(position);
         this.strBuilder = new StringBuilder();
         this.type = Type.RANGED;
-        this.attackRadius = 150.0f;
+        weapon.setup(type);
+        this.attackRadius = weapon.getAttackRange();
+        this.damage = weapon.getDamage();
+        this.attackSpeed = weapon.getAttackSpeed();
+        System.out.println("-------" + getClass().getSimpleName() + "-------");
+        System.out.println(weapon.getQualityWeapon());
+        System.out.println("attackRange " + attackRadius);
+        System.out.println("damage " + damage * 1.5f);
+        System.out.println("attackSpeed " + attackSpeed);
     }
 
     @Override

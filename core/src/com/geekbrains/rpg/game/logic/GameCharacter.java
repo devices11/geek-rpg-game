@@ -20,6 +20,7 @@ public abstract class GameCharacter implements MapElement {
 
     protected TextureRegion texture;
     protected TextureRegion textureHp;
+    protected Weapon weapon;
 
     protected Type type;
     protected State state;
@@ -41,6 +42,8 @@ public abstract class GameCharacter implements MapElement {
     protected float attackTime;
     protected float speed;
     protected int hp, hpMax;
+    protected int damage;
+    protected float attackSpeed;
 
     public int getCellX() {
         return (int) position.x / 80;
@@ -85,6 +88,7 @@ public abstract class GameCharacter implements MapElement {
         this.state = State.IDLE;
         this.stateTimer = 1.0f;
         this.target = null;
+        this.weapon = new Weapon();
     }
 
     public void update(float dt) {
@@ -97,10 +101,10 @@ public abstract class GameCharacter implements MapElement {
         }
         if (state == State.ATTACK && this.position.dst(target.getPosition()) < attackRadius) {
             attackTime += dt;
-            if (attackTime > 0.3f) {
+            if (attackTime > attackSpeed) {
                 attackTime = 0.0f;
                 if (type == Type.MELEE) {
-                    target.takeDamage(this, 1);
+                    target.takeDamage(this, damage);
                 }
                 if (type == Type.RANGED) {
                     gc.getProjectilesController().setup(this, position.x, position.y, target.getPosition().x, target.getPosition().y);

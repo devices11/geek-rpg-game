@@ -6,7 +6,12 @@ import com.badlogic.gdx.math.MathUtils;
 import com.geekbrains.rpg.game.logic.utils.Poolable;
 import com.geekbrains.rpg.game.screens.utils.Assets;
 
+import static com.geekbrains.rpg.game.logic.GameCharacter.Type.MELEE;
+import static com.geekbrains.rpg.game.logic.GameCharacter.Type.RANGED;
+
 public class Monster extends GameCharacter implements Poolable {
+    private float chance = MathUtils.random(0.0f, 100.0f);
+
     @Override
     public boolean isActive() {
         return hp > 0;
@@ -17,9 +22,20 @@ public class Monster extends GameCharacter implements Poolable {
         this.texture = Assets.getInstance().getAtlas().findRegion("knight");
         this.changePosition(800.0f, 300.0f);
         this.dst.set(this.position);
-        this.visionRadius = 160.0f;
-        this.type = Type.RANGED;
-        this.attackRadius = 150.0f;
+        if (chance < 50.0f) this.type = RANGED;
+        else this.type = MELEE;
+        weapon.setup(type);
+        this.visionRadius = weapon.getAttackRange();
+        this.attackRadius = weapon.getAttackRange();
+        this.damage = weapon.getDamage();
+        this.attackSpeed = weapon.getAttackSpeed();
+        System.out.println("-------" + getClass().getSimpleName() + "-------");
+        System.out.println(weapon.getQualityWeapon());
+        System.out.println("type " + type.toString());
+        System.out.println("attackRange " + attackRadius);
+        System.out.println("damage " + damage);
+        System.out.println("attackSpeed " + attackSpeed);
+
     }
 
     public void generateMe() {
