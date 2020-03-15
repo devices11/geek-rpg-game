@@ -17,29 +17,22 @@ public class Hero extends GameCharacter {
     }
 
     public Hero(GameController gc) {
-        super(gc, 30, 300.0f);
-        this.texture = Assets.getInstance().getAtlas().findRegion("knight");
+        super(gc, 80, 300.0f);
+        this.textures = new TextureRegion(Assets.getInstance().getAtlas().findRegion("knight")).split(60, 60);
         this.texturePointer = Assets.getInstance().getAtlas().findRegion("pointer");
         this.changePosition(100.0f, 100.0f);
         this.dst.set(position);
         this.strBuilder = new StringBuilder();
-        this.type = Type.RANGED;
-        weapon.setup(type);
-        this.attackRadius = weapon.getAttackRange();
-        this.damage = weapon.getDamage();
-        this.attackSpeed = weapon.getAttackSpeed();
-        System.out.println("-------" + getClass().getSimpleName() + "-------");
-        System.out.println(weapon.getQualityWeapon());
-        System.out.println("attackRange " + attackRadius);
-        System.out.println("damage " + damage * 1.5f);
-        System.out.println("attackSpeed " + attackSpeed);
+        this.weapon = Weapon.createSimpleMeleeWeapon();
     }
 
     @Override
     public void render(SpriteBatch batch, BitmapFont font) {
         batch.draw(texturePointer, dst.x - 30, dst.y - 30, 30, 30, 60, 60, 0.5f, 0.5f, lifetime * 90.0f);
-        batch.draw(texture, position.x - 30, position.y - 30, 30, 30, 60, 60, 1, 1, 0);
-        batch.draw(textureHp, position.x - 30, position.y + 30, 60 * ((float) hp / hpMax), 12);
+        batch.draw(textures[0][getCurrentFrameIndex()], position.x - 30, position.y - 30, 30, 30, 60, 60, 1, 1, 0);
+        if(hp <hpMax) {
+            batch.draw(textureHp, position.x - 30, position.y + 30, 60 * ((float) hp / hpMax), 12);
+        }
     }
 
     public void renderGUI(SpriteBatch batch, BitmapFont font) {
@@ -47,6 +40,7 @@ public class Hero extends GameCharacter {
         strBuilder.append("Class: ").append("Knight").append("\n");
         strBuilder.append("HP: ").append(hp).append(" / ").append(hpMax).append("\n");
         strBuilder.append("Coins: ").append(coins).append("\n");
+        strBuilder.append("Weapon: ").append(weapon.getTitle()).append(" [").append(weapon.getMinDamage()).append("-").append(weapon.getMaxDamage()).append("]\n");
         font.draw(batch, strBuilder, 10, 710);
     }
 

@@ -2,101 +2,138 @@ package com.geekbrains.rpg.game.logic;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
+import com.geekbrains.rpg.game.logic.utils.Consumable;
+import com.geekbrains.rpg.game.logic.utils.MapElement;
 import com.geekbrains.rpg.game.logic.utils.Poolable;
+import com.geekbrains.rpg.game.screens.utils.Assets;
 
-import static com.geekbrains.rpg.game.logic.GameCharacter.Type.RANGED;
-
-public class Weapon implements Poolable {
-//    public enum WeaponType {
-//        MELEE, RANGED
-//    }
-
-    public enum QualityWeapon {
-        COMMON, RARE, EPIC, HEROIC, DIVINE
+public class Weapon implements MapElement, Poolable, Consumable {
+    public enum Type {
+        MELEE, RANGED
     }
 
-    protected QualityWeapon qualityWeapon;
-    protected float attackRange;
-    protected int damage;
-    protected float attackSpeed;
-    protected float chance;
-    protected boolean withOwner;
+    private TextureRegion texture;
+    private Type type;
+    private String title;
+    private Vector2 position;
+    private int minDamage;
+    private int maxDamage;
+    private float speed;
+    private float range;
+    private boolean active;
 
     @Override
     public boolean isActive() {
-        return true;
+        return active;
     }
 
-    public QualityWeapon getQualityWeapon() {
-        return qualityWeapon;
+    public Vector2 getPosition() {
+        return position;
     }
 
-    public float getAttackRange() {
-        return attackRange;
+    @Override
+    public void consume(GameCharacter gameCharacter) {
+        gameCharacter.setWeapon(this);
+        active = false;
     }
 
-    public int getDamage() {
-        return damage;
+    @Override
+    public void render(SpriteBatch batch, BitmapFont font) {
+        batch.draw(texture, position.x - 32, position.y - 32);
     }
 
-    public float getAttackSpeed() {
-        return attackSpeed;
+    @Override
+    public int getCellX() {
+        return (int) (position.x / 80);
     }
 
-    public boolean isWithOwner() {
-        return withOwner;
+    @Override
+    public int getCellY() {
+        return (int) (position.y / 80);
     }
 
-    public Weapon (){
-        this.chance = MathUtils.random(0.0f, 100.0f);
-        this.qualityWeapon = definitionQuality(chance);
-        this.attackRange = 0.0f;
-        this.damage = 0;
-        this.attackSpeed = 0.0f;
-        this.withOwner = false; //если false не отрисовываем, пока не используется
+    public Type getType() {
+        return type;
     }
 
-    public void setup(GameCharacter.Type type) {
-        characteristic(qualityWeapon, type);
+    public String getTitle() {
+        return title;
     }
 
-    public QualityWeapon definitionQuality (float chance){
-        if (chance > 0.0f && chance <= 0.5f) return QualityWeapon.DIVINE;
-        else if (chance > 0.5f && chance <= 1.5f) return QualityWeapon.HEROIC;
-        else if (chance > 1.5f && chance <= 5.0f) return QualityWeapon.EPIC;
-        else if (chance > 5.0f && chance <= 10.0f) return QualityWeapon.RARE;
-        else return QualityWeapon.COMMON;
+    public int getMinDamage() {
+        return minDamage;
     }
 
-    public void characteristic (QualityWeapon qualityWeapon, GameCharacter.Type type) {
-        if (qualityWeapon.equals(QualityWeapon.DIVINE)){
-            updateCharacteristic(type,70.0f, MathUtils.random(10, 30), 0.1f);
-        }
-        if (qualityWeapon.equals(QualityWeapon.HEROIC)){
-            updateCharacteristic(type,60.0f, MathUtils.random(8, 12), 0.2f);
-        }
-        if (qualityWeapon.equals(QualityWeapon.EPIC)){
-            updateCharacteristic(type,50.0f, MathUtils.random(5, 8), 0.3f);
-        }
-        if (qualityWeapon.equals(QualityWeapon.RARE)){
-            updateCharacteristic(type,45.0f, MathUtils.random(3, 6), 0.4f);
-        }
-        if (qualityWeapon.equals(QualityWeapon.COMMON)){
-            updateCharacteristic(type,40.0f, MathUtils.random(2, 4), 0.5f);
-        }
+    public int getMaxDamage() {
+        return maxDamage;
     }
 
-    public void updateCharacteristic(GameCharacter.Type type, float attackRng, int dmg, float attackSpd){
-        if (type.equals(RANGED)) {
-            attackRange = attackRng * 6;
-            damage = dmg * 2;
-            attackSpeed = attackSpd * 1.5f;
+    public int generateDamage() {
+        return MathUtils.random(minDamage, maxDamage);
+    }
+
+    public float getSpeed() {
+        return speed;
+    }
+
+    public float getRange() {
+        return range;
+    }
+
+    public void setPosition(float x, float y) {
+        this.position.set(x, y);
+    }
+
+    public Weapon() {
+        this.position = new Vector2(0, 0);
+    }
+
+    public Weapon(Type type, String title, int minDamage, int maxDamage, float speed, float range) {
+        this.type = type;
+        this.title = title;
+        this.minDamage = minDamage;
+        this.maxDamage = maxDamage;
+        this.speed = speed;
+        this.range = range;
+    }
+
+    public void setup(Type type, String title, int minDamage, int maxDamage, float speed, float range) {
+        this.type = type;
+        if (type == Type.MELEE) {
+            texture = Assets.getInstance().getAtlas().findRegion("weaponMelee");
         } else {
-            attackRange = attackRng;
-            damage = dmg;
-            attackSpeed = attackSpd;
+            texture = Assets.getInstance().getAtlas().findRegion("weaponRanged");
         }
+        this.title = title;
+        this.minDamage = minDamage;
+        this.maxDamage = maxDamage;
+        this.speed = speed;
+        this.range = range;
+        this.active = true;
     }
 
+    public static Weapon createSimpleRangedWeapon() {
+        return new Weapon(
+                Type.RANGED,
+                "Bow",
+                MathUtils.random(1, 2),
+                MathUtils.random(3, 5),
+                0.5f,
+                150.0f
+        );
+    }
+
+    public static Weapon createSimpleMeleeWeapon() {
+        return new Weapon(
+                Type.MELEE,
+                "Sword",
+                MathUtils.random(1, 2),
+                MathUtils.random(3, 4),
+                0.4f,
+                60.0f
+        );
+    }
 }
